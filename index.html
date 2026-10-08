@@ -3,16 +3,19 @@
 	<head>
 		<meta charset="UTF-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>CG - Trial</title>
+		<title>CG - Hands on</title>
 
 		<script src="./app.js" type="module" defer></script>
 	</head>
 	<body>
-		<h1>CG - Trial</h1>
+		<h1>CG - Hands on</h1>
 
-		<canvas id="render-screen" width="800px" height="600px">
-			<span>Render Screen. Engine renders the graphics here.</span>
-		</canvas>
+		<div class="canvas-container">
+			<canvas id="render-screen" width="800" height="450">
+				<!-- Height and width are chosen as to maintain 16:9 aspect ration. Why? Ah Ah summa... -->
+				<span>Render Screen. Engine renders the graphics here.</span>
+			</canvas>
+		</div>
 
 		<style>
 			* {
@@ -36,11 +39,17 @@
 			}
 
 			#render-screen {
-				margin: 20px;
-				border: 0.5px solid whitesmoke;
-				background: transparent;
+				background: rgb(35 35 35);
 				border-radius: 3px;
-				box-shadow: 3px 3px 100px rgba(10, 10, 10, 0.5);
+				box-shadow: inset 0px 3px 10px 5px rgba(15, 15, 15, 0.2);
+			}
+
+			.canvas-container {
+				width: 100vw;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				margin-top: 50px;
 			}
 		</style>
 	</body>
