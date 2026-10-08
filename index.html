@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="UTF-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+		<title>CG - Trial</title>
+
+		<script src="./app.js" type="module" defer></script>
+	</head>
+	<body>
+		<h1>CG - Trial</h1>
+
+		<canvas id="render-screen" width="800px" height="600px">
+			<span>Render Screen. Engine renders the graphics here.</span>
+		</canvas>
+
+		<style>
+			* {
+				margin: 0;
+				padding: 0;
+				box-sizing: border-box;
+			}
+
+			html {
+				font-family: sans-serif;
+			}
+
+			body {
+				background-color: rgb(25, 25, 25);
+				color: whitesmoke;
+			}
+
+			h1 {
+				font-weight: normal;
+				margin: 20px 50px;
+			}
+
+			#render-screen {
+				margin: 20px;
+				border: 0.5px solid whitesmoke;
+				background: transparent;
+				border-radius: 3px;
+				box-shadow: 3px 3px 100px rgba(10, 10, 10, 0.5);
+			}
+		</style>
+	</body>
+</html>
