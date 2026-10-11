@@ -8,14 +8,17 @@ import {
 	getIndex,
 	vecLen,
 	dotPdt,
+	matrixMultiply,
 } from "./utils.js"
 
 // This library is for matrix multiplication it is GPU-Accelerated. Might look like an overhead. But if the no. of polygons is large, it will be useful.
+
 // import { matrixMultiply } from "https://cdn.jsdelivr.net/npm/matmul-gpu/+esm"
 
-const SURF_COLOR = [200, 200, 200, 255]
-// const LIGHT_VEC = [0, -Math.sqrt(2) / 2, Math.sqrt(2) / 2]
-const LIGHT_VEC = [1, 1, 0.5]
+const SURF_COLOR = [255, 255, 255, 255]
+// const LIGHT_VEC = [0, Math.sqrt(2) / 2, Math.sqrt(2) / 2]
+// const LIGHT_VEC = [-Math.SQRT1_2, -Math.SQRT1_2, Math.SQRT1_2]
+const LIGHT_VEC = [0, 1, 1]
 
 const canvasEl = document.querySelector("#render-screen")
 const ctx = canvasEl.getContext("2d")
@@ -47,29 +50,34 @@ function normalMap(triangles, vertices) {
 
 function projectTo2D(vertices) {
 	return vertices.map((vert) => {
-		const z = vert[2] + 1 // here I am moving the entire object from screen by one unit
-		return [vert[0] / z, vert[1] / z, vert[2]]
+		const z = vert[2]
+		return [Math.ceil(vert[0] / z), Math.ceil(vert[1] / z), z]
 	})
 }
 
-// Here I'm dividing by 2, otherwise the object will occupy the entire canvas
-let vertices = denormalize(norm_vertices, width / 2, height / 2)
-// let vertices = norm_vertices
 // All the vertices are now in matrix format. So that I can apply transformations
-const vertMat = convertToMatrix(vertices)
-
+let vertMat = convertToMatrix(norm_vertices)
+console.log(vertMat)
+vertMat = matrixMultiply(
+	[
+		[1, 0, 0],
+		[0, 1, 0],
+		[0, 0, 1],
+	],
+	vertMat,
+)
+console.log(vertMat)
 // Final Stage: Rasterization. Creating polygons and filling pixels
-vertices = convertToArr(vertMat)
-const normals = normalMap(triangles, vertices)
-
-// Keep it last, otherwise normals would all be perpendicular to the screen surface
+let vertices = convertToArr(vertMat)
 vertices = projectTo2D(vertices)
+const normals = normalMap(triangles, vertices)
+vertices = denormalize(vertices, width, height)
 
 const frameBuffer = Array.from({ length: height }, () =>
 	Array.from({ length: width }, () => [0, 0, 0, 0]),
 )
 const zBuffer = Array.from({ length: height }, () =>
-	Array(width).fill(Infinity),
+	Array.from({ length: width }, () => Infinity),
 )
 
 triangles.forEach((triangle, ind) => {
@@ -85,8 +93,9 @@ triangles.forEach((triangle, ind) => {
 	const avgZ = (v1[2] + v2[2] + v3[2]) / 3
 	const area = getArea(v1, v2, v3)
 
-	for (let i = Math.round(minX); i < Math.round(maxX) - 1; i++) {
-		for (let j = Math.round(minY); j < Math.round(maxY) - 1; j++) {
+	for (let i = Math.round(minX); i < Math.floor(maxX) - 1; i++) {
+		for (let j = Math.round(minY); j < Math.floor(maxY) - 1; j++) {
+			if (i >= width || j >= height || i < 0 || j < 0) continue
 			if (avgZ >= zBuffer[j][i]) continue
 
 			// A vertex P is inside a triangle if the area formed by the triangles PAB, PAC, PBC is equal to the area formed by ABC, otherwise the pt. is outside the triangle. Quite simple and intiutive.
