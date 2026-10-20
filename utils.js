@@ -17,7 +17,7 @@ export function getIndex([x, y, _], width) {
 }
 
 // For Normalize and denormalize functions
-const SCALING_FAC = 100
+const SCALING_FAC = 1 // for the models i have use 30 for sphere and 1 for cylinder
 
 export function denormalize(vertices, w, h) {
 	// This function can be used if your wireframe co-ords are normalized. In my case it is true.
@@ -30,11 +30,12 @@ export function denormalize(vertices, w, h) {
 		// 	const x = (vert[0] / 2) * (w / 2) + w / 2
 		// 	const y = (vert[1] / 2) * (h / 2) + h / 2
 		// 	const z = vert[2] + 2
-		const x = vert[0] + w / 2
-		const y = vert[1] + h / 2
-		const z = vert[2] + 1
+		const x = vert[0] * SCALING_FAC + w / 2
+		const y = vert[1] * SCALING_FAC + h / 2
+		const z = vert[2]
+		console.log(x, y, z)
 
-		return [Math.floor(x), Math.floor(y), Math.ceil(z)]
+		return [Math.floor(x), Math.floor(y), z]
 	})
 }
 
@@ -52,11 +53,7 @@ export function convertToArr(mat) {
 	const vertices = []
 
 	for (let i = 0; i < mat[0].length; i++) {
-		vertices.push([
-			Math.ceil(mat[0][i]),
-			Math.ceil(mat[1][i]),
-			Math.ceil(mat[2][i]),
-		])
+		vertices.push([mat[0][i], mat[1][i], mat[2][i]])
 	}
 
 	return vertices

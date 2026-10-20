@@ -18,7 +18,7 @@ import {
 const SURF_COLOR = [255, 255, 255, 255]
 // const LIGHT_VEC = [0, Math.sqrt(2) / 2, Math.sqrt(2) / 2]
 // const LIGHT_VEC = [-Math.SQRT1_2, -Math.SQRT1_2, Math.SQRT1_2]
-const LIGHT_VEC = [0, 1, 1]
+const LIGHT_VEC = [1, 0, 1]
 
 const canvasEl = document.querySelector("#render-screen")
 const ctx = canvasEl.getContext("2d")
@@ -51,7 +51,7 @@ function normalMap(triangles, vertices) {
 function projectTo2D(vertices) {
 	return vertices.map((vert) => {
 		const z = vert[2]
-		return [Math.ceil(vert[0] / z), Math.ceil(vert[1] / z), z]
+		return [vert[0] / z, vert[1] / z, z]
 	})
 }
 
@@ -69,8 +69,8 @@ vertMat = matrixMultiply(
 console.log(vertMat)
 // Final Stage: Rasterization. Creating polygons and filling pixels
 let vertices = convertToArr(vertMat)
-vertices = projectTo2D(vertices)
 const normals = normalMap(triangles, vertices)
+vertices = projectTo2D(vertices)
 vertices = denormalize(vertices, width, height)
 
 const frameBuffer = Array.from({ length: height }, () =>
@@ -96,7 +96,7 @@ triangles.forEach((triangle, ind) => {
 	for (let i = Math.round(minX); i < Math.floor(maxX) - 1; i++) {
 		for (let j = Math.round(minY); j < Math.floor(maxY) - 1; j++) {
 			if (i >= width || j >= height || i < 0 || j < 0) continue
-			if (avgZ >= zBuffer[j][i]) continue
+			if (avgZ > zBuffer[j][i]) continue
 
 			// A vertex P is inside a triangle if the area formed by the triangles PAB, PAC, PBC is equal to the area formed by ABC, otherwise the pt. is outside the triangle. Quite simple and intiutive.
 			const localVert = [i, j]
@@ -108,7 +108,8 @@ triangles.forEach((triangle, ind) => {
 			if (!isInside) continue
 
 			zBuffer[j][i] = avgZ
-			const intensity = Math.abs(dotPdt(normals[ind], LIGHT_VEC))
+			const dotPdtVal = dotPdt(normals[ind], LIGHT_VEC)
+			const intensity = dotPdtVal < 0 ? Math.abs(dotPdtVal) : 0
 			frameBuffer[j][i][0] = SURF_COLOR[0]
 			frameBuffer[j][i][1] = SURF_COLOR[1]
 			frameBuffer[j][i][2] = SURF_COLOR[2]
